@@ -19,13 +19,14 @@ var timeStart = new Date()
 async function compoundMoney() {
     console.log("Starting compounding at time ", new Date())
     await withdrawContract.methods.withdraw(0,0).send({from: account.address, gas: 500000});
-    const currentNonce = await web3.eth.getTransactionCount(account.address);
     const currentPendingBoo = await depositContract.methods.pendingBOO(0, account.address).call();
     const currentBalanceBoo = await spookyContract.methods.balanceOf(account.address).call();
     const balanceToDeposit = Number(currentBalanceBoo) + Number(currentPendingBoo)
     booCompounded += balanceToDeposit
     console.log("currentPendingBoo: ", currentPendingBoo, " currentBalanceBoo: ", currentBalanceBoo, " \nBalance to deposit: " + balanceToDeposit)
     
+    const currentNonce = await web3.eth.getTransactionCount(account.address);
+
     console.log("Depositing ", currentBalanceBoo)
     depositContract.methods.deposit(0, currentBalanceBoo).send({from: account.address, gas: 500000, nonce: currentNonce});
 
