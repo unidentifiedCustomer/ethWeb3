@@ -1,44 +1,133 @@
 import Web3 from 'web3';
 import readlineSync from 'readline-sync';
+import { wFTM_BOO_MASTERCHEF_CONTRACT, wFTM_BOO_MASTER_CONTRACT_ABI, wFTMABI, uniswapV2PairABI, wFTMBOOspLPAddress, wFTMAddress, SPOOKYSWAP_ROUTER_ABI, SPOOKYSWAP_ROUTER_ADDRESS, BOO_ADDRESS, BOO_CONTRACT_ABI, SPOOKYSWAP_DEPOSIT_CONTRACT_ABI, SPOOKYSWAP_DEPOSIT_CONTRACT_ADDRESS, SPOOKYSWAP_WITHDRAW_CONTRACT_ADDRESS, SPOOKYSWAP_WITHDRAW_CONTRACT_ABI } from './contracts.js'
+import { FANTOM_MAINNET_RPC, ETH_MAINNET_RPC, ETH_MAINNENT_WSS, WETH_MAINNET_CONTRACT, ETH_ROPSTEN_RPC, ETH_ROPSTEN_WSS, WETH_ROPSTEN_CONTRACT, BSC_MAINNENT_RPC, BSC_MAINNENT_WSS, BNB_MAINNET_CONTRACT } from './constants.js'
+import { ethers } from 'ethers';
+import { convertToHex } from './functionCalls.js'
 
-const web3 = new Web3('https://rpcapi.fantom.network')
+var customHttpProvider = new ethers.providers.JsonRpcProvider(FANTOM_MAINNET_RPC);
+
 const key = readlineSync.question('Enter private key\n', {
-    hideEchoBack: true // The typed text on screen is hidden by `*` (default).
-  });
-const account = web3.eth.accounts.wallet.add(key)
+  hideEchoBack: true // The typed text on screen is hidden by `*` (default).
+});
 
-const spookyContract = new web3.eth.Contract([{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"delegator","type":"address"},{"indexed":true,"internalType":"address","name":"fromDelegate","type":"address"},{"indexed":true,"internalType":"address","name":"toDelegate","type":"address"}],"name":"DelegateChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"delegate","type":"address"},{"indexed":false,"internalType":"uint256","name":"previousBalance","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"newBalance","type":"uint256"}],"name":"DelegateVotesChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"DELEGATION_TYPEHASH","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"DOMAIN_SEPARATOR","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"DOMAIN_TYPEHASH","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint32","name":"","type":"uint32"}],"name":"checkpoints","outputs":[{"internalType":"uint32","name":"fromBlock","type":"uint32"},{"internalType":"uint256","name":"votes","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"delegatee","type":"address"}],"name":"delegate","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"delegatee","type":"address"},{"internalType":"uint256","name":"nonce","type":"uint256"},{"internalType":"uint256","name":"expiry","type":"uint256"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"delegateBySig","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"delegator","type":"address"}],"name":"delegates","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"getCurrentVotes","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getMaxTotalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"uint256","name":"blockNumber","type":"uint256"}],"name":"getPriorVotes","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_to","type":"address"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"nonces","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"numCheckpoints","outputs":[{"internalType":"uint32","name":"","type":"uint32"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"deadline","type":"uint256"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"permit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}], "0x841fad6eae12c286d1fd18d1d525dffa75c7effe");
+const account = new ethers.Wallet(key, customHttpProvider);
 
-const depositContract = new web3.eth.Contract([{"inputs":[{"internalType":"contract SpookyToken","name":"_boo","type":"address"},{"internalType":"uint256","name":"_booPerSecond","type":"uint256"},{"internalType":"uint256","name":"_startTime","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"EmergencyWithdraw","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Withdraw","type":"event"},{"inputs":[{"internalType":"uint256","name":"_allocPoint","type":"uint256"},{"internalType":"contract IERC20","name":"_Token","type":"address"}],"name":"add","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"boo","outputs":[{"internalType":"contract SpookyToken","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"booPerSecond","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint32","name":"addSeconds","type":"uint32"}],"name":"changeEndTime","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"}],"name":"emergencyWithdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"endTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_from","type":"uint256"},{"internalType":"uint256","name":"_to","type":"uint256"}],"name":"getMultiplier","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"massUpdatePools","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"address","name":"_user","type":"address"}],"name":"pendingBOO","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"poolInfo","outputs":[{"internalType":"contract IERC20","name":"Token","type":"address"},{"internalType":"uint256","name":"stakingTokenTotalAmount","type":"uint256"},{"internalType":"uint256","name":"allocPoint","type":"uint256"},{"internalType":"uint256","name":"lastRewardTime","type":"uint256"},{"internalType":"uint256","name":"accBOOPerShare","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"poolLength","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_allocPoint","type":"uint256"}],"name":"set","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_booPerSecond","type":"uint256"}],"name":"setBooPerSecond","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalAllocPoint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"}],"name":"updatePool","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"}],"name":"userInfo","outputs":[{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"rewardDebt","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}], "0xacaca07e398d4946ad12232f40f255230e73ca72")
+const spookyContract = new ethers.Contract(BOO_ADDRESS, BOO_CONTRACT_ABI, account);
 
-const withdrawContract = new web3.eth.Contract([{"inputs":[{"internalType":"contract SpookyToken","name":"_boo","type":"address"},{"internalType":"address","name":"_devaddr","type":"address"},{"internalType":"uint256","name":"_booPerSecond","type":"uint256"},{"internalType":"uint256","name":"_startTime","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"EmergencyWithdraw","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Withdraw","type":"event"},{"inputs":[],"name":"MaxAllocPoint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_allocPoint","type":"uint256"},{"internalType":"contract IERC20","name":"_lpToken","type":"address"}],"name":"add","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"boo","outputs":[{"internalType":"contract SpookyToken","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"booPerSecond","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_devaddr","type":"address"}],"name":"dev","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"devaddr","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"}],"name":"emergencyWithdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_from","type":"uint256"},{"internalType":"uint256","name":"_to","type":"uint256"}],"name":"getMultiplier","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"massUpdatePools","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"maxBooPerSecond","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"address","name":"_user","type":"address"}],"name":"pendingBOO","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"poolInfo","outputs":[{"internalType":"contract IERC20","name":"lpToken","type":"address"},{"internalType":"uint256","name":"allocPoint","type":"uint256"},{"internalType":"uint256","name":"lastRewardTime","type":"uint256"},{"internalType":"uint256","name":"accBOOPerShare","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"poolLength","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_allocPoint","type":"uint256"}],"name":"set","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_booPerSecond","type":"uint256"}],"name":"setBooPerSecond","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalAllocPoint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"}],"name":"updatePool","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"}],"name":"userInfo","outputs":[{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"rewardDebt","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}], "0x2b2929e785374c651a81a63878ab22742656dcdd")
+const wFTMContract = new ethers.Contract(wFTMAddress, wFTMABI, account)
 
-const timeToCheckInMinutes = 5
-const timeToCheckInMs = timeToCheckInMinutes * 60000 
+const depositContract = new ethers.Contract(SPOOKYSWAP_DEPOSIT_CONTRACT_ADDRESS, SPOOKYSWAP_DEPOSIT_CONTRACT_ABI, account)
+
+const withdrawContract = new ethers.Contract(SPOOKYSWAP_WITHDRAW_CONTRACT_ADDRESS, SPOOKYSWAP_WITHDRAW_CONTRACT_ABI, account)
+
+const spookySwapRouter = new ethers.Contract(SPOOKYSWAP_ROUTER_ADDRESS, SPOOKYSWAP_ROUTER_ABI, account)
+
+const wFTMBOOspLPContract = new ethers.Contract(wFTMBOOspLPAddress, uniswapV2PairABI, account)
+
+const wFTMBooContract = new ethers.Contract(wFTM_BOO_MASTERCHEF_CONTRACT, wFTM_BOO_MASTER_CONTRACT_ABI, account)
+
+const timeToCheckInMinutes = 7
+const timeToCheckInMs = timeToCheckInMinutes * 60000
 
 var booCompounded = 0
-var timeStart = new Date()
+var timesCompounded = 0
 
-async function compoundMoney() {
-    console.log("Starting compounding at time ", new Date())
-    await withdrawContract.methods.withdraw(0,0).send({from: account.address, gas: 500000});
-    const currentPendingBoo = await depositContract.methods.pendingBOO(0, account.address).call();
-    const currentBalanceBoo = await spookyContract.methods.balanceOf(account.address).call();
-    const balanceToDeposit = Number(currentBalanceBoo) + Number(currentPendingBoo)
-    booCompounded += balanceToDeposit
-    console.log("currentPendingBoo: ", currentPendingBoo, " currentBalanceBoo: ", currentBalanceBoo, " \nBalance to deposit: " + balanceToDeposit)
-
-    const currentNonce = await web3.eth.getTransactionCount(account.address);
-
-    console.log("Depositing ", currentBalanceBoo)
-    depositContract.methods.deposit(0, currentBalanceBoo).send({from: account.address, gas: 500000, nonce: currentNonce});
-
-    console.log("Depositing ", currentPendingBoo)
-    depositContract.methods.deposit(0, currentPendingBoo).send({from: account.address, gas: 500000, nonce: currentNonce + 1});
-
-    const timeElapsedSessionInMs = new Date() - timeStart
-    const timeElapsedSessionInMinutes = Math.round(((timeElapsedSessionInMs % 86400000) % 3600000) / 60000);
-    console.log("Finished depositing, resuming sleep \ntotal Boo compounded this session: " + booCompounded + " over " + timeElapsedSessionInMinutes + " minutes")
+async function getPrices(pairAddress) {
+  // const reserves = await wFTMBOOspLPContract.getReserves()
+  // const resv0 = Number(reserves._reserve1)
+  // console.log(resv0)
+  const getEthUsdPrice = await wFTMBOOspLPContract.getReserves()
+    .then(reserves => Number(reserves._reserve0) / Number(reserves._reserve1));
+  return getEthUsdPrice;
 }
 
-setInterval(compoundMoney, timeToCheckInMs)
+async function compoundMoney() {
+  console.log("Starting compounding at time ", new Date())
+  await withdrawContract.withdraw(0, 0);
+  const currentPendingBoo = await depositContract.pendingBOO(0, account.address);
+  const currentBalanceBoo = await spookyContract.balanceOf(account.address);
+  const balanceToDeposit = Number(currentBalanceBoo) + Number(currentPendingBoo)
+  booCompounded += balanceToDeposit
+  console.log("currentPendingBoo: ", currentPendingBoo, " currentBalanceBoo: ", currentBalanceBoo, " \nBalance to deposit: " + balanceToDeposit)
+
+  const currentNonce = await account.getTransactionCount();
+
+  console.log("Depositing ", currentBalanceBoo)
+  depositContract.deposit(0, currentBalanceBoo, { nonce: currentNonce });
+
+  console.log("Depositing ", currentPendingBoo)
+  depositContract.deposit(0, currentPendingBoo, { nonce: currentNonce + 1 });
+
+  timesCompounded += +1
+  console.log("Finished depositing, resuming sleep \ntotal Boo compounded this session: " + booCompounded + " over " + timesCompounded * timeToCheckInMinutes + " minutes")
+}
+
+var booLPCompounded = 0
+var timesLPCompounded = 0
+
+function convertEthToWei(number) {
+  return Web3.utils.toWei(number.toString(), 'ether')
+}
+
+async function compoundMoneyIntoLP() {
+  console.log("Starting LP compounding at time ", new Date())
+
+  // withdraw SLP rewards
+  const withdrawTx =await withdrawContract.withdraw(0,0);
+  await customHttpProvider.waitForTransaction(withdrawTx.hash)
+  const currentBalanceBoo = await spookyContract.balanceOf(account.address);
+
+  const amountToSell = Math.floor(currentBalanceBoo / 2)
+  console.log("selling " + amountToSell)
+
+  const wFTMperBOO = await getPrices(wFTMBOOspLPAddress)
+
+  const slippage = Number(0.01)
+  const expectedwFTMAmountOut = wFTMperBOO * amountToSell * (Number(1) - slippage)
+  console.log("expecting out " + expectedwFTMAmountOut)
+
+  const path = new Array(BOO_ADDRESS, wFTMAddress)
+
+  // swap half
+  const swapTx = await spookySwapRouter.swapExactTokensForETH(convertToHex(amountToSell), convertToHex(expectedwFTMAmountOut), path, account.address, getTimeLimit(), { gasLimit: 350000 })
+  await customHttpProvider.waitForTransaction(swapTx.hash);
+  console.log("swapped half of BOO for FTM")
+  
+  const newBalanceBoo = await spookyContract.balanceOf(account.address);
+
+  // get new ratio to deposit
+  const amountToDepositFTM = await getPrices(wFTMBOOspLPAddress) * newBalanceBoo
+
+  const lpSlippage = Number(0.97)
+
+  const amountBooToDeposit = newBalanceBoo
+  const newLocal = convertToHex(amountBooToDeposit * lpSlippage);
+  // add liquidity
+  const addLiquidityTx = await spookySwapRouter.addLiquidityETH(BOO_ADDRESS, amountBooToDeposit.toHexString(), newLocal, convertToHex(Math.floor(amountToDepositFTM * lpSlippage)), account.address, getTimeLimit(), { gasLimit: 400000, value: convertToHex(amountToDepositFTM) })
+  await customHttpProvider.waitForTransaction(addLiquidityTx.hash)
+  console.log("liquidity added")
+  const sLPBalance = await wFTMBOOspLPContract.balanceOf(account.address)
+  const sLPBalanceHex = sLPBalance.toHexString()
+  console.log(sLPBalanceHex)
+
+  const depositTx = await wFTMBooContract.deposit(0, sLPBalanceHex);
+  await customHttpProvider.waitForTransaction(depositTx.hash)
+  console.log("sLP deposited")
+
+  timesCompounded += +1
+  console.log("Finished depositing, resuming sleep")
+}
+
+function getTimeLimit() {
+  const currentTime = new Date().getTime() / 1000 | 0;
+  const txTimeLimitInMinutes = 3;
+  const txTimeLimitInUnix = +currentTime + +txTimeLimitInMinutes * +60;
+  return txTimeLimitInUnix;
+}
+
+// compoundMoney()
+// setInterval(compoundMoney, timeToCheckInMs)
+
+// compoundMoneyIntoLP()
+setInterval(compoundMoneyIntoLP, timeToCheckInMs)
