@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { MATIC_MAINNET_RPC } from './constants.js'
 import Web3 from 'web3'
-import { AAVE_WETH_GATEWAY_MATIC, AAVE_WETH_GATEWAY_MATIC_ABI, WMATIC_ADDRESS, WMATIC_CONTRACT_ABI, AAVE_INCENTIVES_CONTRACT_MATIC, AAVE_INCENTIVES_CONTRACT_MATIC_ABI, AAVE_LENDING_CONTRACT_MATIC, AAVE_LENDING_CONTRACT_MATIC_ABI, MATIC_ADDRESS, MATIC_CONTRACT_ABI, AAVE_PRICE_ORACLE_MATIC, AAVE_PRICE_ORACLE_MATIC_ABI } from './contracts.js'
+import { AAVE_WMATIC_CONTRACT, AAVE_WMATIC_DEBT_CONTRACT, AAVE_WETH_GATEWAY_MATIC, AAVE_WETH_GATEWAY_MATIC_ABI, WMATIC_ADDRESS, WMATIC_CONTRACT_ABI, AAVE_INCENTIVES_CONTRACT_MATIC, AAVE_INCENTIVES_CONTRACT_MATIC_ABI, AAVE_LENDING_CONTRACT_MATIC, AAVE_LENDING_CONTRACT_MATIC_ABI, MATIC_ADDRESS, MATIC_CONTRACT_ABI, AAVE_PRICE_ORACLE_MATIC, AAVE_PRICE_ORACLE_MATIC_ABI } from './contracts.js'
 import { convertToHex } from './functionCalls.js'
 import readlineSync from 'readline-sync';
 
@@ -10,7 +10,7 @@ var customHttpProvider = new ethers.providers.JsonRpcProvider(MATIC_MAINNET_RPC)
 const key = readlineSync.question('Enter private key\n', {
     hideEchoBack: true // The typed text on screen is hidden by `*` (default).
   });
-
+  
 const account = new ethers.Wallet(key, customHttpProvider);
 
 const aaveIncentivesContract = new ethers.Contract(AAVE_INCENTIVES_CONTRACT_MATIC, AAVE_INCENTIVES_CONTRACT_MATIC_ABI, account);
@@ -48,7 +48,7 @@ async function aaveLeverageUp() {
     console.log("Starting leverage up on MATIC AAVE")
 
     console.log("claiming pending rewards")
-    await aaveIncentivesContract.claimRewards([], claimMax, account.address).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash));
+    await aaveIncentivesContract.claimRewards([AAVE_WMATIC_CONTRACT, AAVE_WMATIC_DEBT_CONTRACT], claimMax, account.address, { gasLimit: 1000000 }).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash));
     console.log("claimed pending rewards")
     // get wMATIC balance
 
@@ -85,8 +85,9 @@ async function aaveLeverageUp() {
     console.log("balance is < threshold, going to sleep")
 }
 
-const timeToCheckInMinutes = 20
+const timeToCheckInMinutes = 120
 const timeToCheckInMs = timeToCheckInMinutes * 60000
 
 aaveLeverageUp()
 setInterval(aaveLeverageUp, timeToCheckInMs)
+
