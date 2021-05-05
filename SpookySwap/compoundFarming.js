@@ -89,7 +89,7 @@ async function compoundMoneyIntoLP() {
   const path = new Array(BOO_ADDRESS, wFTMAddress)
 
   // swap half
-  spookySwapRouter.swapExactTokensForETH(convertToHex(amountToSell), convertToHex(expectedwFTMAmountOut), path, account.address, getTimeLimit(), { gasLimit: 350000 }).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash))
+  await spookySwapRouter.swapExactTokensForETH(convertToHex(amountToSell), convertToHex(expectedwFTMAmountOut), path, account.address, getTimeLimit(), { gasLimit: 350000 }).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash))
   console.log("swapped half of BOO for FTM")
   
   const newBalanceBoo = await spookyContract.balanceOf(account.address);
@@ -102,7 +102,7 @@ async function compoundMoneyIntoLP() {
   const amountBooToDeposit = newBalanceBoo
   const newLocal = convertToHex(amountBooToDeposit * lpSlippage);
   // add liquidity
-  spookySwapRouter.addLiquidityETH(BOO_ADDRESS, amountBooToDeposit.toHexString(), newLocal, convertToHex(Math.floor(amountToDepositFTM * lpSlippage)), account.address, getTimeLimit(), { gasLimit: 400000, value: convertToHex(amountToDepositFTM) }).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash))
+  await spookySwapRouter.addLiquidityETH(BOO_ADDRESS, amountBooToDeposit.toHexString(), newLocal, convertToHex(Math.floor(amountToDepositFTM * lpSlippage)), account.address, getTimeLimit(), { gasLimit: 400000, value: convertToHex(amountToDepositFTM) }).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash))
   console.log("liquidity added")
   const sLPBalance = await wFTMBOOspLPContract.balanceOf(account.address)
   const sLPBalanceHex = sLPBalance.toHexString()
@@ -113,13 +113,6 @@ async function compoundMoneyIntoLP() {
 
   timesCompounded += +1
   console.log("Finished depositing, resuming sleep")
-}
-
-function getTimeLimit() {
-  const currentTime = new Date().getTime() / 1000 | 0;
-  const txTimeLimitInMinutes = 3;
-  const txTimeLimitInUnix = +currentTime + +txTimeLimitInMinutes * +60;
-  return txTimeLimitInUnix;
 }
 
 // compoundMoney()
