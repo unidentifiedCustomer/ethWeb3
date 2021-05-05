@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import readlineSync from 'readline-sync';
 import { wFTM_BOO_MASTERCHEF_CONTRACT, wFTM_BOO_MASTER_CONTRACT_ABI, wFTMABI, uniswapV2PairABI, wFTMBOOspLPAddress, wFTMAddress, SPOOKYSWAP_ROUTER_ABI, SPOOKYSWAP_ROUTER_ADDRESS, BOO_ADDRESS, BOO_CONTRACT_ABI, SPOOKYSWAP_DEPOSIT_CONTRACT_ABI, SPOOKYSWAP_DEPOSIT_CONTRACT_ADDRESS, SPOOKYSWAP_WITHDRAW_CONTRACT_ADDRESS, SPOOKYSWAP_WITHDRAW_CONTRACT_ABI } from './contracts.js'
-import { FANTOM_MAINNET_RPC } from './constants.js'
+import { FANTOM_MAINNET_RPC, ETH_MAINNET_RPC, ETH_MAINNENT_WSS, WETH_MAINNET_CONTRACT, ETH_ROPSTEN_RPC, ETH_ROPSTEN_WSS, WETH_ROPSTEN_CONTRACT, BSC_MAINNENT_RPC, BSC_MAINNENT_WSS, BNB_MAINNET_CONTRACT } from './constants.js'
 import { ethers } from 'ethers';
 import { convertToHex } from './functionCalls.js'
 
@@ -74,8 +74,7 @@ async function compoundMoneyIntoLP() {
   console.log("Starting LP compounding at time ", new Date())
 
   // withdraw SLP rewards
-  const withdrawTx =await withdrawContract.withdraw(0,0);
-  await customHttpProvider.waitForTransaction(withdrawTx.hash)
+  await withdrawContract.withdraw(0,0).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash))
   const currentBalanceBoo = await spookyContract.balanceOf(account.address);
 
   const amountToSell = Math.floor(currentBalanceBoo / 2)
@@ -90,8 +89,7 @@ async function compoundMoneyIntoLP() {
   const path = new Array(BOO_ADDRESS, wFTMAddress)
 
   // swap half
-  const swapTx = await spookySwapRouter.swapExactTokensForETH(convertToHex(amountToSell), convertToHex(expectedwFTMAmountOut), path, account.address, getTimeLimit(), { gasLimit: 350000 })
-  await customHttpProvider.waitForTransaction(swapTx.hash);
+  spookySwapRouter.swapExactTokensForETH(convertToHex(amountToSell), convertToHex(expectedwFTMAmountOut), path, account.address, getTimeLimit(), { gasLimit: 350000 }).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash))
   console.log("swapped half of BOO for FTM")
   
   const newBalanceBoo = await spookyContract.balanceOf(account.address);
@@ -104,15 +102,13 @@ async function compoundMoneyIntoLP() {
   const amountBooToDeposit = newBalanceBoo
   const newLocal = convertToHex(amountBooToDeposit * lpSlippage);
   // add liquidity
-  const addLiquidityTx = await spookySwapRouter.addLiquidityETH(BOO_ADDRESS, amountBooToDeposit.toHexString(), newLocal, convertToHex(Math.floor(amountToDepositFTM * lpSlippage)), account.address, getTimeLimit(), { gasLimit: 400000, value: convertToHex(amountToDepositFTM) })
-  await customHttpProvider.waitForTransaction(addLiquidityTx.hash)
+  spookySwapRouter.addLiquidityETH(BOO_ADDRESS, amountBooToDeposit.toHexString(), newLocal, convertToHex(Math.floor(amountToDepositFTM * lpSlippage)), account.address, getTimeLimit(), { gasLimit: 400000, value: convertToHex(amountToDepositFTM) }).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash))
   console.log("liquidity added")
   const sLPBalance = await wFTMBOOspLPContract.balanceOf(account.address)
   const sLPBalanceHex = sLPBalance.toHexString()
   console.log(sLPBalanceHex)
 
-  const depositTx = await wFTMBooContract.deposit(0, sLPBalanceHex);
-  await customHttpProvider.waitForTransaction(depositTx.hash)
+  await wFTMBooContract.deposit(0, sLPBalanceHex).then(tx => tx.wait()).then(tx => console.log(tx.transactionHash))
   console.log("sLP deposited")
 
   timesCompounded += +1
